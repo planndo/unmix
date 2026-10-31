@@ -159,6 +159,15 @@ input[type=range]:disabled { opacity: .4; }
 .meter .trk b { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--fg); transition: left .6s cubic-bezier(.2,.7,.2,1); }
 .meter output { font: 12px var(--f-mono); color: var(--muted); text-align: right; }
 
+.insts { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+.inst { border: 1px solid var(--line); background: var(--surface-2); border-radius: 14px; padding: 12px 14px; display: grid; gap: 6px; animation: rise .5s cubic-bezier(.2,.7,.2,1) both; }
+.inst .top { display: flex; align-items: baseline; gap: 8px; justify-content: space-between; }
+.inst b { font-weight: 600; }
+.inst .conf { font: 11px var(--f-mono); padding: 2px 8px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+.inst .conf.hi { color: var(--other); border-color: var(--other); }
+.inst small { color: var(--muted); font-size: 12px; }
+.inst .vol output { width: 56px; }
+.lane .ctrl .subl { font-size: 12px; color: var(--muted); margin-top: -6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .toast { position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); background: var(--fg); color: var(--bg); padding: 10px 16px; border-radius: 99px; font-size: 14px; font-weight: 500; opacity: 0; pointer-events: none; transition: all .3s; z-index: 20; max-width: calc(100% - 32px); }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 .keys { color: var(--faint); font-size: 12.5px; text-align: center; }
@@ -218,7 +227,7 @@ footer { color: var(--faint); font-size: 12.5px; padding-block: 0 40px; }
     <div class="facts">
       <div class="fact"><b>Studio-grade models</b><span>MDX-Net networks trained on multitrack recordings, the same family used by pro stem tools.</span></div>
       <div class="fact"><b>Your song stays with you</b><span>The AI runs inside this browser tab on your GPU or CPU. No uploads, no queue, no account.</span></div>
-      <div class="fact"><b>Mix, loop and export</b><span>Solo, mute and balance every stem, loop a section to practise, export 44.1 kHz WAV.</span></div>
+      <div class="fact"><b>Knows what's playing</b><span>Recognises marimba, sax, guitar, keys, strings and more, and gives each one its own Focus EQ.</span></div>
     </div>
   </section>
 
@@ -259,6 +268,12 @@ footer { color: var(--faint); font-size: 12.5px; padding-block: 0 40px; }
       </button>
     </div>
 
+    <div class="card" id="instCard" hidden>
+      <h3><span id="instTitle">Instruments in “Other”</span><button class="ghost-btn" type="button" id="instReset">Reset</button></h3>
+      <p class="hint" id="instHint">Recognised by an AI trained on 2 million labelled sound clips. Each slider is a Focus EQ: it turns down the part of the spectrum where that instrument sits in this song, so it gets quieter without cutting the whole stem.</p>
+      <div class="insts" id="insts"></div>
+    </div>
+
     <div class="dock">
       <div class="card" id="mixCard">
         <h3>Mixer
@@ -287,12 +302,13 @@ footer { color: var(--faint); font-size: 12.5px; padding-block: 0 40px; }
   </section>
 </main>
 
-<div class="wrap"><footer>Unmix separates audio with open MDX-Net models (Kim Vocal 2 and KUIELab drums and bass), run by ONNX Runtime Web. Only process music you have the rights to use.</footer></div>
+<div class="wrap"><footer>Unmix separates audio with open MDX-Net models (Kim Vocal 2 and KUIELab drums and bass) and recognises instruments with EfficientAT (AudioSet), all run by ONNX Runtime Web. Only process music you have the rights to use.</footer></div>
 <div class="toast" id="toast" role="status"></div>
 
 <script type="module">
 import * as sep from './separator.js';
 const { prepare, runStem, downloadSize } = sep;
+import { detectInstruments } from './instruments.js';
 import { computePeaks, blockPowers, lufsFromPowers, estimateBpm, encodeWav, makeZip } from './audio-utils.js';
 
 const $ = (id) => document.getElementById(id);
@@ -357,8 +373,8 @@ addEventListener('drop', (e) => { const f = e.dataTransfer?.files?.[0]; if (f &&
 
 /* ---------- processing ---------- */
 const PHASES = () => mode === '4'
-  ? [['load', 'Load AI models'], ['decode', 'Read audio'], ['voice', 'Separate vocals'], ['drums', 'Isolate drums'], ['bass', 'Isolate bass'], ['finish', 'Analyse mix']]
-  : [['load', 'Load AI model'], ['decode', 'Read audio'], ['voice', 'Separate vocals'], ['finish', 'Analyse mix']];
+  ? [['load', 'Load AI models'], ['decode', 'Read audio'], ['voice', 'Separate vocals'], ['drums', 'Isolate drums'], ['bass', 'Isolate bass'], ['tag', 'Identify instruments'], ['finish', 'Analyse mix']]
+  : [['load', 'Load AI model'], ['decode', 'Read audio'], ['voice', 'Separate vocals'], ['tag', 'Identify instruments'], ['finish', 'Analyse mix']];
 function setPhase(key, label) {
   $('phase').textContent = label;
   const list = PHASES(); const idx = list.findIndex((p) => p[0] === key);
@@ -381,7 +397,7 @@ async function decode(file) {
 
 async function start(file) {
   stopPlayback();
-  S.name = file.name.replace(/\.[^.]+$/, ''); S.ready = false; S.stems = {}; S.bpm = null;
+  S.name = file.name.replace(/\.[^.]+$/, ''); S.ready = false; S.stems = {}; S.bpm = null; S.instruments = []; renderInstruments();
   S.order = mode === '4' ? ['voice', 'drums', 'bass', 'other'] : ['voice', 'music'];
   $('landing').hidden = true; $('studio').hidden = false; scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
   $('songName').textContent = S.name; $('meta').innerHTML = ''; $('status').classList.remove('error'); $('statusActions').hidden = true; $('status').hidden = false;
@@ -390,7 +406,7 @@ async function start(file) {
   buildLanes(); buildPanels();
   const abort = new AbortController(); S.abort = abort; const t0 = performance.now();
   try {
-    const keys = mode === '4' ? ['vocals', 'drums', 'bass'] : ['vocals'];
+    const keys = mode === '4' ? ['vocals', 'drums', 'bass', 'tagger'] : ['vocals', 'tagger'];
     setPhase('decode', 'Reading audio');
     const dec = await decode(file);
     S.L = dec.L; S.R = dec.R; S.n = S.L.length; S.dur = S.n / SR;
@@ -435,6 +451,12 @@ async function start(file) {
       S.stems.bass.L = b.L; S.stems.bass.R = b.R; doneWork += workStem;
       const o = S.stems.other; for (let i = 0; i < S.n; i++) { o.L[i] = iL[i] - d.L[i] - b.L[i]; o.R[i] = iR[i] - d.R[i] - b.R[i]; }
     }
+    S.eqStem = mode === '4' ? 'other' : 'music'; S.instruments = [];
+    setPhase('tag', 'Listening for instruments');
+    try {
+      S.instruments = await detectInstruments(S.stems[S.eqStem], SR, sep.runTagger);
+      S.instruments.forEach((x) => (x.db = 0));
+    } catch (e) { console.warn('[unmix] instrument recognition failed', e); }
     setPhase('finish', 'Analysing loudness and tempo');
     await new Promise((r) => setTimeout(r, 30));
     for (const k of S.order) { const s = S.stems[k]; computePeaks(s.L, s.R, BINS, s.peaks); s.filled = S.n; s.lufs = lufsFromPowers(blockPowers(s.L, s.R)); }
@@ -444,6 +466,7 @@ async function start(file) {
     addMeta(`${S.order.length} stems`);
     setBar(1);
     await player.load();
+    renderInstruments();
     S.ready = true; setControlsEnabled(true); drawAll(); renderMeters();
     const secs = (performance.now() - t0) / 1000;
     $('status').hidden = true;
@@ -563,7 +586,7 @@ try { new ResizeObserver(() => { drawAll(); placeHead(); }).observe($('board'));
 
 /* ---------- playback ---------- */
 const player = {
-  ac: null, buffers: {}, gains: {}, master: null, sources: [], playing: false, offset: 0, startedAt: 0, loop: { on: false, a: 0, b: 0 },
+  ac: null, buffers: {}, gains: {}, eq: [], master: null, sources: [], playing: false, offset: 0, startedAt: 0, loop: { on: false, a: 0, b: 0 },
   async load() {
     if (!this.ac) this.ac = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: SR });
     const ac = this.ac; this.buffers = {}; this.gains = {};
@@ -572,6 +595,9 @@ const player = {
       const s = S.stems[k], b = ac.createBuffer(2, S.n, SR); b.copyToChannel(s.L, 0); b.copyToChannel(s.R, 1);
       this.buffers[k] = b; const g = ac.createGain(); g.connect(this.master); this.gains[k] = g;
     }
+    // Focus EQ: one peaking band per recognised instrument, in series before the stem's fader
+    this.eq = (S.instruments || []).map((ins) => { const f = ac.createBiquadFilter(); f.type = 'peaking'; f.frequency.value = ins.center; f.Q.value = ins.q; f.gain.value = ins.db; return f; });
+    this.eq.forEach((f, i) => f.connect(this.eq[i + 1] || this.gains[S.eqStem]));
     this.offset = 0; this.loop = { on: false, a: 0, b: 0 }; updateLoopUi(); this.apply(true);
   },
   apply(instant) {
@@ -592,7 +618,7 @@ const player = {
     const when = this.ac.currentTime + 0.03;
     this.sources = S.order.map((k) => { const src = this.ac.createBufferSource(); src.buffer = this.buffers[k];
       if (this.loop.on && this.loop.b > this.loop.a) { src.loop = true; src.loopStart = this.loop.a; src.loopEnd = this.loop.b; }
-      src.connect(this.gains[k]); src.start(when, this.offset); return src; });
+      src.connect(k === S.eqStem && this.eq.length ? this.eq[0] : this.gains[k]); src.start(when, this.offset); return src; });
     this.sources[0].onended = () => { if (this.playing && !this.loop.on) { this.playing = false; this.offset = 0; uiPlay(); } };
     this.startedAt = when - this.offset; this.playing = true; uiPlay(); tick();
   },
@@ -707,7 +733,7 @@ function buildPanels() {
   add('Vocals only', '--voice', () => [[`${S.name} (Vocals).wav`, wavOf('voice')]]);
   add('Instrumental', '--music', () => [[`${S.name} (Instrumental).wav`, mode === '4' ? encodeWav(S.inst.L, S.inst.R) : wavOf('music')]]);
   if (mode === '4') { add('Drums', '--drums', () => [[`${S.name} (Drums).wav`, wavOf('drums')]]); add('Bass', '--bass', () => [[`${S.name} (Bass).wav`, wavOf('bass')]]); add('Other', '--other', () => [[`${S.name} (Other).wav`, wavOf('other')]]); }
-  add('Your mix', '--fg', () => [[`${S.name} (My mix).wav`, mixWav()]]);
+  add('Your mix', '--fg', async () => [[`${S.name} (My mix).wav`, await mixWav()]]);
   add(mode === '4' ? 'All stems + instrumental (.zip)' : 'Both stems (.zip)', null, () => {
     const files = S.order.map((k) => [`${S.name} (${STEMS[k].label}).wav`, wavOf(k)]);
     if (mode === '4') files.push([`${S.name} (Instrumental).wav`, encodeWav(S.inst.L, S.inst.R)]);
@@ -767,11 +793,47 @@ function renderMeters() {
 $('mAuto').addEventListener('click', renderMeters);
 document.addEventListener('input', (e) => { if (e.target.id?.startsWith('g-') && !$('autoPane').hidden) renderMeters(); });
 
+/* ---------- instruments + focus EQ ---------- */
+function fmtHz(f) { return f >= 1000 ? `${(f / 1000).toFixed(f >= 10000 ? 0 : 1)} kHz` : `${Math.round(f)} Hz`; }
+function renderInstruments() {
+  const card = $('instCard'), box = $('insts'); if (!card) return;
+  const list = S.instruments || [];
+  card.hidden = !S.order.length || (!S.ready && !list.length);
+  const stemLabel = STEMS[S.eqStem || 'other']?.label || 'Other';
+  $('instTitle').textContent = `Instruments in “${stemLabel}”`;
+  box.innerHTML = '';
+  if (!list.length) { box.innerHTML = `<p class="hint">No other instruments stood out clearly in this stem. Its fader still controls everything in it.</p>`; }
+  list.forEach((ins, i) => {
+    const conf = ins.score >= 0.5 ? ['Clear', 'hi'] : ins.score >= 0.25 ? ['Likely', 'hi'] : ['Possible', ''];
+    const el = document.createElement('div'); el.className = 'inst'; el.style.setProperty('--c', 'var(--other)'); el.style.animationDelay = `${i * 70}ms`;
+    el.innerHTML = `<div class="top"><b>${ins.name}</b><span class="conf ${conf[1]}" title="Recognition score ${(ins.score * 100).toFixed(0)}%">${conf[0]} · ${(ins.score * 100).toFixed(0)}%</span></div>
+      <small>${ins.detail && ins.detail !== ins.name ? ins.detail + ' · ' : ''}focus around ${fmtHz(ins.center)}</small>
+      <div class="vol"><input type="range" id="eq-${i}" min="-24" max="6" step="1" value="${ins.db}" aria-label="${ins.name} level"><output id="eqo-${i}"></output></div>`;
+    box.append(el);
+    const r = el.querySelector('input'); const sync = () => { $(`eqo-${i}`).textContent = ins.db === 0 ? '0 dB' : `${ins.db > 0 ? '+' : ''}${ins.db} dB`; r.style.setProperty('--p', `${((ins.db + 24) / 30) * 100}%`); };
+    r.oninput = () => { ins.db = +r.value; sync(); const f = player.eq[i]; if (f && player.ac) f.gain.setTargetAtTime(ins.db, player.ac.currentTime, 0.03); };
+    sync();
+  });
+  // name the recognised instruments under the stem's lane title
+  const lane = document.querySelector(`.lane[data-k="${S.eqStem}"] .ctrl`);
+  if (lane) { lane.querySelector('.subl')?.remove(); if (list.length) { const d = document.createElement('div'); d.className = 'subl'; d.textContent = list.map((x) => x.detail || x.name).join(', '); lane.querySelector('.name').after(d); } }
+}
+$('instReset').onclick = () => { (S.instruments || []).forEach((x, i) => { x.db = 0; const f = player.eq[i]; if (f) f.gain.value = 0; }); renderInstruments(); };
+
 /* ---------- export ---------- */
 function wavOf(k) { const s = S.stems[k]; return encodeWav(s.L, s.R); }
-function mixWav() {
-  const n = S.n, L = new Float32Array(n), R = new Float32Array(n);
-  for (const k of S.order) { const g = effGain(k); if (!g) continue; const s = S.stems[k]; for (let i = 0; i < n; i++) { L[i] += s.L[i] * g; R[i] += s.R[i] * g; } }
+async function eqStem() { // the Focus EQ applied offline, exactly as in playback
+  const s = S.stems[S.eqStem];
+  if (!S.instruments?.some((x) => x.db !== 0)) return s;
+  const ctx = new OfflineAudioContext(2, S.n, SR); const b = ctx.createBuffer(2, S.n, SR); b.copyToChannel(s.L, 0); b.copyToChannel(s.R, 1);
+  const src = ctx.createBufferSource(); src.buffer = b; let node = src;
+  for (const ins of S.instruments) { const f = ctx.createBiquadFilter(); f.type = 'peaking'; f.frequency.value = ins.center; f.Q.value = ins.q; f.gain.value = ins.db; node.connect(f); node = f; }
+  node.connect(ctx.destination); src.start(); const r = await ctx.startRendering();
+  return { L: r.getChannelData(0), R: r.getChannelData(1) };
+}
+async function mixWav() {
+  const n = S.n, L = new Float32Array(n), R = new Float32Array(n); const eqd = await eqStem();
+  for (const k of S.order) { const g = effGain(k); if (!g) continue; const s = k === S.eqStem ? eqd : S.stems[k]; for (let i = 0; i < n; i++) { L[i] += s.L[i] * g; R[i] += s.R[i] * g; } }
   let peak = 0; for (let i = 0; i < n; i++) peak = Math.max(peak, Math.abs(L[i]), Math.abs(R[i]));
   return encodeWav(L, R, SR, peak > 0.999 ? 0.999 / peak : 1); // clip protection
 }
@@ -791,7 +853,7 @@ async function saveFiles(files) {
 }
 async function runDownload(btn, fn) {
   if (!S.ready) return; btn.disabled = true; const old = btn.innerHTML; btn.querySelector('span').textContent = 'Preparing…';
-  try { await new Promise((r) => setTimeout(r, 20)); await saveFiles(fn()); toast('Download ready'); }
+  try { await new Promise((r) => setTimeout(r, 20)); await saveFiles(await fn()); toast('Download ready'); }
   catch (e) { if (e?.code === 'declined') toast('Download cancelled'); else toast(`Could not save the file: ${e?.message || e}`); }
   finally { btn.innerHTML = old; btn.disabled = false; }
 }

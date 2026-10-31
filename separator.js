@@ -8,6 +8,7 @@ export const MODELS = {
   vocals: { label: 'Voice model', parts: 5, file: 'kim-vocal-2', bytes: 66759214, nFft: 7680, hop: 1024, dimF: 3072, dimT: 256 },
   drums:  { label: 'Drums model', parts: 3, file: 'kuielab-drums', bytes: 29703204, nFft: 4096, hop: 1024, dimF: 2048, dimT: 512 },
   bass:   { label: 'Bass model',  parts: 3, file: 'kuielab-bass',  bytes: 29703204, nFft: 16384, hop: 1024, dimF: 2048, dimT: 512 },
+  tagger: { label: 'Instrument recogniser', parts: 2, file: 'efficientat-mn10', bytes: 23976736 },
 };
 const RUNTIME_BYTES = 5091678;
 
@@ -124,4 +125,26 @@ export async function runStem(key, L, R, { onChunk, signal, preferGpu = true } =
     });
   } finally { closePool(pool); }
   return { L: oL, R: oR };
+}
+
+// Instrument recognition on 10 s, 32 kHz mono windows. Returns one Float32Array(527) per window.
+export async function runTagger(waves) {
+  const w = new Worker(new URL('./tag-worker.js', import.meta.url), { type: 'module' });
+  try {
+    await new Promise((resolve, reject) => {
+      w.onmessage = (e) => (e.data.type === 'ready' ? resolve() : reject(new Error(e.data.message)));
+      w.onerror = (e) => reject(new Error(e.message || 'Instrument recogniser failed to start'));
+      w.postMessage({ type: 'init', model: modelBytes.tagger.slice().buffer, wasmBinary: runtime.slice(0),
+        mjsUrl: new URL('ort/ort-wasm-simd-threaded.jsep.mjs', BASE).href,
+        threads: typeof crossOriginIsolated !== 'undefined' && crossOriginIsolated ? Math.min(4, navigator.hardwareConcurrency || 2) : 1 });
+    });
+    const out = [];
+    for (let i = 0; i < waves.length; i++) {
+      out.push(await new Promise((resolve, reject) => {
+        w.onmessage = (e) => (e.data.type === 'out' ? resolve(e.data.probs) : reject(new Error(e.data.message)));
+        w.postMessage({ type: 'run', id: i, wave: waves[i] });
+      }));
+    }
+    return out;
+  } finally { w.terminate(); }
 }

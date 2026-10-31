@@ -11,6 +11,9 @@ Nothing is uploaded: the AI models run on the visitor's own GPU (WebGPU) or CPU 
 - **Auto-mix:** measures each stem's integrated loudness (ITU-R BS.1770, LUFS) and balances the faders for a goal
   (Balanced, Vocal forward, Band focus, Karaoke, Drum practice, Bass practice) while keeping the song's overall loudness.
 - **Exports:** vocals, instrumental, each stem, your current mix, or everything as a zip. 44.1 kHz 16-bit WAV.
+- **Instrument recognition + Focus EQ:** an AudioSet-trained model (EfficientAT mn10) listens to the "Other" stem
+  (or the instrumental) and lists what it hears (marimba, saxophone, guitar, keys, strings, brass, accordion...).
+  Each one gets a Focus EQ slider: a peaking band placed where that instrument sits in this particular song.
 - Tempo estimate, keyboard shortcuts, light and dark themes, works at phone width.
 
 ## Run locally
@@ -40,6 +43,8 @@ isolated on Pages, which lets the CPU engine use multiple threads (about twice a
 ## Credits
 - Models: [UVR MDX-Net ONNX releases](https://github.com/TRvlvr/model_repo) (Kim Vocal 2, KUIELab drums/bass).
   Model files are split into parts under 15 MB with a `.wasm` extension so strict static hosts accept them.
+- Instrument recognition: [EfficientAT](https://github.com/fschmid56/EfficientAT) `mn10_as` (MIT), re-implemented
+  in `tools/export_tagger.py` and exported to ONNX with its mel front end built in.
 - Runtime: [onnxruntime-web](https://www.npmjs.com/package/onnxruntime-web) 1.22.0 (MIT).
 - [coi-serviceworker](https://github.com/gzuidhof/coi-serviceworker) (MIT).
 
