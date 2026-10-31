@@ -173,6 +173,9 @@ input[type=range]:disabled { opacity: .4; }
 .keys { color: var(--faint); font-size: 12.5px; text-align: center; }
 .keys kbd { font: 11px var(--f-mono); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 1px 5px; color: var(--muted); }
 footer { color: var(--faint); font-size: 12.5px; padding-block: 0 40px; }
+footer .credit { margin: 0 0 8px; font-size: 14px; color: var(--muted); }
+footer .credit a { color: var(--fg); font-weight: 600; text-decoration: none; background: linear-gradient(90deg, var(--voice), var(--drums), var(--bass), var(--other)) no-repeat 0 100% / 100% 2px; padding-bottom: 2px; transition: background-size .3s; }
+footer .credit a:hover { background-size: 100% 100%; color: var(--bg); }
 
 @media (max-width: 720px) {
   .board { --lane-w: 0px; }
@@ -302,7 +305,7 @@ footer { color: var(--faint); font-size: 12.5px; padding-block: 0 40px; }
   </section>
 </main>
 
-<div class="wrap"><footer>Unmix separates audio with open MDX-Net models (Kim Vocal 2 and KUIELab drums and bass) and recognises instruments with EfficientAT (AudioSet), all run by ONNX Runtime Web. Only process music you have the rights to use.</footer></div>
+<div class="wrap"><footer><p class="credit">Developed by <a href="https://www.linkedin.com/in/joseamandlate/" target="_blank" rel="noopener">Pygrammer</a></p>Unmix separates audio with open MDX-Net models (Kim Vocal 2 and KUIELab drums and bass) and recognises instruments with EfficientAT (AudioSet), all run by ONNX Runtime Web. Only process music you have the rights to use.</footer></div>
 <div class="toast" id="toast" role="status"></div>
 
 <script type="module">
