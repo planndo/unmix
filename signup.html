@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Create your account | Unmix</title>
+<meta name="description" content="Create a free Unmix account and separate 5 songs a month, privately on your own device.">
+<link rel="canonical" href="https://planndo.github.io/unmix/signup.html">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#0e0d15">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="site.css">
+</head>
+<body data-auth-page="signup">
+<div class="auth-shell">
+  <main class="auth-form-side">
+    <a class="brand" id="authBrand" href="index.html" aria-label="Unmix home"></a>
+    <div class="auth-form-wrap">
+      <div id="formView" class="form-stack" style="gap:20px">
+        <div style="display:grid;gap:8px">
+          <h1>Create your account</h1>
+          <p class="muted">Start free. No card needed.</p>
+        </div>
+        <div id="googleBlock" class="form-stack" hidden>
+          <button class="btn btn-secondary btn-block" type="button" id="googleBtn">Continue with Google</button>
+          <div class="or">or</div>
+        </div>
+        <form id="authForm" class="form-stack" novalidate>
+          <div class="field">
+            <label for="name">Name</label>
+            <input id="name" name="name" autocomplete="name" required aria-describedby="nameErr">
+            <span class="err" id="nameErr" hidden></span>
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" inputmode="email" required aria-describedby="emailErr">
+            <span class="err" id="emailErr" hidden></span>
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <div class="pw-wrap">
+              <input id="password" name="password" type="password" autocomplete="new-password" minlength="8" required aria-describedby="passwordHint passwordErr">
+              <button class="pw-toggle" type="button" aria-pressed="false" aria-label="Show password">Show</button>
+            </div>
+            <span class="hint" id="passwordHint">At least 8 characters</span>
+            <span class="err" id="passwordErr" hidden></span>
+          </div>
+          <div class="field">
+            <label class="check" style="font-weight:400"><input id="terms" type="checkbox" required aria-describedby="termsErr"><span>I agree to the <a href="terms.html" target="_blank">Terms</a> and <a href="privacy.html" target="_blank">Privacy Policy</a></span></label>
+            <span class="err" id="termsErr" hidden></span>
+          </div>
+          <p class="notice bad" id="formError" role="alert" hidden></p>
+          <button class="btn btn-primary btn-block" type="submit">Create free account</button>
+        </form>
+        <p class="switch-line">Already have an account? <a class="link" href="login.html" data-keep-next>Log in</a></p>
+      </div>
+
+      <div id="sentView" class="form-stack" hidden aria-live="polite">
+        <h1 id="sentTitle"></h1>
+        <p class="muted" id="sentBody"></p>
+        <p class="fine">Can't see it? Check your spam folder.</p>
+        <a class="btn btn-secondary" href="login.html" data-keep-next>Back to log in</a>
+      </div>
+
+      <div id="offView" class="form-stack" hidden>
+        <h1>Accounts are coming soon</h1>
+        <p class="muted">You can use Unmix right now without signing up.</p>
+        <a class="btn btn-primary" href="studio.html">Open Studio</a>
+      </div>
+    </div>
+  </main>
+
+  <aside class="auth-visual" aria-hidden="true">
+    <svg class="fan" viewBox="0 0 640 300" fill="none" stroke-linecap="round">
+      <path d="M0 150 C 90 150, 120 150, 190 150" stroke="var(--muted)" stroke-width="3"/>
+      <path d="M190 150 C 280 150, 280 42, 370 42 S 500 26, 560 42" stroke="var(--voice)" stroke-width="3"/>
+      <path d="M190 150 C 280 150, 280 114, 370 114 S 500 96, 560 114" stroke="var(--drums)" stroke-width="3"/>
+      <path d="M190 150 C 280 150, 280 186, 370 186 S 500 204, 560 186" stroke="var(--bass)" stroke-width="3"/>
+      <path d="M190 150 C 280 150, 280 258, 370 258 S 500 274, 560 258" stroke="var(--other)" stroke-width="3"/>
+      <text x="576" y="47">Vocals</text><text x="576" y="119">Drums</text><text x="576" y="191">Bass</text><text x="576" y="263">Other</text>
+    </svg>
+    <div style="display:grid;gap:18px">
+      <p class="heading" style="max-width:15ch">Your music never leaves your device.</p>
+      <ul class="auth-points">
+        <li style="--c:var(--voice)"><i></i>5 free songs every month</li>
+        <li style="--c:var(--drums)"><i></i>Lossless WAV export</li>
+        <li style="--c:var(--other)"><i></i>Nothing is uploaded</li>
+      </ul>
+    </div>
+  </aside>
+</div>
+<script type="module" src="auth-page.js"></script>
+</body>
+</html>

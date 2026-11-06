@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Log in | Unmix</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#0e0d15">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="site.css">
+</head>
+<body data-auth-page="login">
+<div class="auth-shell">
+  <main class="auth-form-side">
+    <a class="brand" id="authBrand" href="index.html" aria-label="Unmix home"></a>
+    <div class="auth-form-wrap">
+      <div id="formView" class="form-stack" style="gap:20px">
+        <h1>Welcome back</h1>
+        <div id="googleBlock" class="form-stack" hidden>
+          <button class="btn btn-secondary btn-block" type="button" id="googleBtn">Continue with Google</button>
+          <div class="or">or</div>
+        </div>
+        <form id="authForm" class="form-stack" novalidate>
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" inputmode="email" required aria-describedby="emailErr">
+            <span class="err" id="emailErr" hidden></span>
+          </div>
+          <div class="field">
+            <div class="row-between"><label for="password">Password</label><a class="link" style="font-size:13px;font-weight:500" href="forgot.html">Forgot password?</a></div>
+            <div class="pw-wrap">
+              <input id="password" name="password" type="password" autocomplete="current-password" required aria-describedby="passwordErr">
+              <button class="pw-toggle" type="button" aria-pressed="false" aria-label="Show password">Show</button>
+            </div>
+            <span class="err" id="passwordErr" hidden></span>
+          </div>
+          <p class="notice bad" id="formError" role="alert" hidden></p>
+          <button class="btn btn-primary btn-block" type="submit">Log in</button>
+        </form>
+        <p class="switch-line">New to Unmix? <a class="link" href="signup.html" data-keep-next>Create a free account</a></p>
+      </div>
+      <div id="sentView" class="form-stack" hidden><h1 id="sentTitle"></h1><p class="muted" id="sentBody"></p></div>
+      <div id="offView" class="form-stack" hidden>
+        <h1>Accounts are coming soon</h1>
+        <p class="muted">You can use Unmix right now without logging in.</p>
+        <a class="btn btn-primary" href="studio.html">Open Studio</a>
+      </div>
+    </div>
+  </main>
+  <aside class="auth-visual" aria-hidden="true">
+    <svg class="fan" viewBox="0 0 640 300" fill="none" stroke-linecap="round">
+      <path d="M0 150 C 90 150, 120 150, 190 150" stroke="var(--muted)" stroke-width="3"/>
+      <path d="M190 150 C 280 150, 280 42, 370 42 S 500 26, 560 42" stroke="var(--voice)" stroke-width="3"/>
+      <path d="M190 150 C 280 150, 280 114, 370 114 S 500 96, 560 114" stroke="var(--drums)" stroke-width="3"/>
+      <path d="M190 150 C 280 150, 280 186, 370 186 S 500 204, 560 186" stroke="var(--bass)" stroke-width="3"/>
+      <path d="M190 150 C 280 150, 280 258, 370 258 S 500 274, 560 258" stroke="var(--other)" stroke-width="3"/>
+      <text x="576" y="47">Vocals</text><text x="576" y="119">Drums</text><text x="576" y="191">Bass</text><text x="576" y="263">Other</text>
+    </svg>
+    <p class="heading" style="max-width:15ch">Pick up where you left off.</p>
+  </aside>
+</div>
+<script type="module" src="auth-page.js"></script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Choose a new password | Unmix</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#0e0d15">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="site.css">
+</head>
+<body data-auth-page="reset">
+<main class="auth-form-side" style="min-height:100dvh">
+  <a class="brand" id="authBrand" href="index.html" aria-label="Unmix home"></a>
+  <div class="auth-form-wrap">
+    <div id="formView" class="form-stack" style="gap:20px">
+      <h1>Choose a new password</h1>
+      <form id="authForm" class="form-stack" novalidate>
+        <div class="field">
+          <label for="password">New password</label>
+          <div class="pw-wrap">
+            <input id="password" name="password" type="password" autocomplete="new-password" minlength="8" required aria-describedby="passwordHint passwordErr">
+            <button class="pw-toggle" type="button" aria-pressed="false" aria-label="Show password">Show</button>
+          </div>
+          <span class="hint" id="passwordHint">At least 8 characters</span>
+          <span class="err" id="passwordErr" hidden></span>
+        </div>
+        <p class="notice bad" id="formError" role="alert" hidden></p>
+        <button class="btn btn-primary btn-block" type="submit">Save new password</button>
+      </form>
+    </div>
+    <div id="sentView" class="form-stack" hidden>
+      <h1 id="sentTitle"></h1>
+      <p class="muted" id="sentBody"></p>
+      <a class="btn btn-primary" id="sentAction" href="forgot.html" hidden>Request a new link</a>
+    </div>
+    <div id="offView" class="form-stack" hidden>
+      <h1>Accounts are coming soon</h1>
+      <a class="btn btn-primary" href="studio.html">Open Studio</a>
+    </div>
+  </div>
+</main>
+<script type="module" src="auth-page.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "name": "Unmix",
+  "short_name": "Unmix",
+  "description": "AI stem separation that runs on your own device.",
+  "start_url": "studio.html",
+  "display": "standalone",
+  "background_color": "#0e0d15",
+  "theme_color": "#0e0d15",
+  "icons": [{ "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

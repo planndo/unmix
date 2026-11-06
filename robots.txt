@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /unmix/account.html
+Disallow: /unmix/reset.html
+
+Sitemap: https://planndo.github.io/unmix/sitemap.xml

@@ -1,0 +1,4 @@
+# Used by `supabase functions deploy`. The webhook is called by Stripe, which has no
+# Supabase login, so it proves itself with Stripe's signature instead (see stripe-webhook).
+[functions.stripe-webhook]
+verify_jwt = false

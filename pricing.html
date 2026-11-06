@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Pricing | Unmix</title>
+<meta name="description" content="Unmix is free for 5 songs a month. Pro adds unlimited songs, 4 stems, Auto-mix and instrument recognition for $5 a month. Cancel anytime.">
+<link rel="canonical" href="https://planndo.github.io/unmix/pricing.html">
+<meta property="og:title" content="Unmix pricing">
+<meta property="og:description" content="Free for 5 songs a month. Pro is $5 a month. Cancel anytime.">
+<meta property="og:image" content="https://planndo.github.io/unmix/og-image.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#0e0d15">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div id="site-header-slot"></div>
+<main class="wrap">
+  <section class="page-top" style="justify-items:start;gap:18px">
+    <h1 class="display" style="font-size:clamp(42px,6.6vw,76px)">Simple pricing. <span class="stem-text">Cancel anytime.</span></h1>
+    <div class="seg" role="group" aria-label="Billing period">
+      <button type="button" id="billMonth" aria-pressed="true">Monthly</button>
+      <button type="button" id="billYear" aria-pressed="false">Yearly<span class="save">Save 35%</span></button>
+    </div>
+    <p class="notice" id="pricingNote" role="status" hidden></p>
+  </section>
+
+  <section class="plans" aria-label="Plans">
+    <article class="plan">
+      <div class="plan-name">Free</div>
+      <div><div class="price">$0</div><p class="price-note">No card needed</p></div>
+      <ul id="freeList"></ul>
+      <a class="btn btn-secondary btn-block" href="signup.html" data-signup-cta>Create free account</a>
+    </article>
+    <article class="plan featured">
+      <div class="plan-name">Pro</div>
+      <div><div class="price"><span id="proPrice">$5</span><small id="proSuffix">/ month</small></div><p class="price-note" id="proNote">Billed monthly</p></div>
+      <ul id="proList"></ul>
+      <button class="btn btn-primary btn-block" type="button" id="upgrade">Upgrade to Pro</button>
+      <p class="fine" style="text-align:center;margin-top:-8px">Secure payment by Stripe. Cancel from your account.</p>
+    </article>
+  </section>
+
+  <section class="section" style="padding-bottom:0">
+    <div class="section-head"><h2 class="heading">Compare plans</h2></div>
+    <div class="compare-wrap">
+      <table class="compare">
+        <thead><tr><th scope="col">Feature</th><th scope="col">Free</th><th scope="col">Pro</th></tr></thead>
+        <tbody>
+          <tr class="group"><th scope="colgroup" colspan="3">Separation</th></tr>
+          <tr><th scope="row">Songs</th><td>5 a month</td><td class="yes">Unlimited</td></tr>
+          <tr><th scope="row">Voice + instrumental</th><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+          <tr><th scope="row">4 stems: vocals, drums, bass, other</th><td class="no">No</td><td class="yes">Yes</td></tr>
+          <tr><th scope="row">Instrument recognition with Focus EQ</th><td class="no">No</td><td class="yes">Yes</td></tr>
+          <tr><th scope="row">Runs privately on your device</th><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+          <tr class="group"><th scope="colgroup" colspan="3">Mixing</th></tr>
+          <tr><th scope="row">Faders, solo, mute and loops</th><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+          <tr><th scope="row">Presets</th><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+          <tr><th scope="row">Auto-mix</th><td class="no">No</td><td class="yes">Yes</td></tr>
+          <tr class="group"><th scope="colgroup" colspan="3">Export</th></tr>
+          <tr><th scope="row">Each stem as lossless WAV</th><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+          <tr><th scope="row">Export your mix</th><td class="no">No</td><td class="yes">Yes</td></tr>
+          <tr><th scope="row">Download everything as a zip</th><td class="no">No</td><td class="yes">Yes</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section" style="padding-bottom:24px">
+    <div class="section-head"><h2 class="heading">Billing questions</h2></div>
+    <div class="faq">
+      <details><summary>Can I cancel anytime?</summary><p>Yes. Open your account page, choose Manage billing and cancel. You keep Pro until the end of the period you've paid for, and then your account moves to Free.</p></details>
+      <details><summary>What happens to my songs if I cancel?</summary><p>Unmix doesn't store your songs, so there is nothing to lose. Any files you exported are on your device and remain yours.</p></details>
+      <details><summary>Can I switch between monthly and yearly?</summary><p>Yes, from Manage billing on your account page.</p></details>
+      <details><summary>When does the free allowance reset?</summary><p>On the first day of each month (UTC). Unused songs don't carry over.</p></details>
+      <details><summary>Does Pro make separation faster?</summary><p>No. Separation runs on your own device on every plan, so its speed depends on your hardware.</p></details>
+    </div>
+  </section>
+</main>
+<div id="site-footer-slot"></div>
+<script type="module">
+import { $, startUpgrade } from './site.js';
+import { accountsEnabled, getPlan } from './auth.js';
+import { PRICE, FREE_SONGS_PER_MONTH } from './plans.js';
+
+const tick = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>';
+const list = (items) => items.map((t) => `<li>${tick}<span>${t}</span></li>`).join('');
+$('freeList').innerHTML = list([`${FREE_SONGS_PER_MONTH} songs a month`, 'Voice + instrumental separation', 'Manual mixer and presets', 'Lossless WAV download of each stem', 'Runs privately on your device']);
+$('proList').innerHTML = list(['Unlimited songs', '4 stems: vocals, drums, bass and other', 'Auto-mix', 'Instrument recognition with Focus EQ', 'Export your mix, and download everything as a zip', 'Everything in Free']);
+
+let interval = 'month';
+function setInterval_(next) {
+  interval = next;
+  $('billMonth').setAttribute('aria-pressed', String(next === 'month'));
+  $('billYear').setAttribute('aria-pressed', String(next === 'year'));
+  $('proPrice').textContent = PRICE[next].amount;
+  $('proSuffix').textContent = PRICE[next].suffix;
+  $('proNote').textContent = PRICE[next].note;
+}
+$('billMonth').onclick = () => setInterval_('month');
+$('billYear').onclick = () => setInterval_('year');
+
+const note = (text, kind) => { const n = $('pricingNote'); n.hidden = false; n.textContent = text; n.className = `notice ${kind || ''}`; };
+if (new URLSearchParams(location.search).get('checkout') === 'cancelled') note('Checkout cancelled. You haven\'t been charged.');
+
+const upgrade = $('upgrade');
+if (!accountsEnabled) {
+  upgrade.disabled = true; upgrade.textContent = 'Coming soon';
+} else {
+  upgrade.onclick = () => startUpgrade(interval, upgrade, (m) => note(m, 'bad'));
+  getPlan().then((plan) => {
+    if (plan.tier !== 'pro') return;
+    upgrade.onclick = () => { location.href = 'account.html'; };
+    upgrade.textContent = 'You have Pro. Manage it';
+  }).catch(() => {});
+}
+</script>
+</body>
+</html>

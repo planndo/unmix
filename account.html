@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Your account | Unmix</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#0e0d15">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div id="site-header-slot"></div>
+<main class="wrap">
+  <section class="page-top">
+    <h1>Your account</h1>
+    <p class="muted" id="whoami">Loading…</p>
+  </section>
+
+  <div class="stack" id="content" hidden>
+    <p class="notice" id="banner" role="status" hidden></p>
+
+    <div class="grid-75">
+      <section class="card">
+        <span class="eyebrow">Current plan</span>
+        <div class="plan-big" id="planName">Free</div>
+        <div class="usage" id="usageBox">
+          <div class="row-between"><span id="usageText"></span></div>
+          <div class="usage-bar" id="usageBar" aria-hidden="true"></div>
+          <span class="fine mono" id="usageReset"></span>
+        </div>
+        <p class="muted" id="subStatus" hidden></p>
+        <div id="upgradeBox" class="form-stack">
+          <div class="seg" role="group" aria-label="Billing period" style="justify-self:start">
+            <button type="button" id="billMonth" aria-pressed="true">$5 monthly</button>
+            <button type="button" id="billYear" aria-pressed="false">$39 yearly<span class="save">Save 35%</span></button>
+          </div>
+          <button class="btn btn-primary" type="button" id="upgrade" style="justify-self:start">Upgrade to Pro</button>
+          <span class="fine">Cancel anytime. Secure payment by Stripe.</span>
+        </div>
+      </section>
+      <section class="card" id="proCard">
+        <span class="eyebrow">What Pro adds</span>
+        <ul class="pro-list">
+          <li style="--c:var(--voice)"><i></i><span><b>Unlimited songs</b></span></li>
+          <li style="--c:var(--drums)"><i></i><span><b>4 stems:</b> vocals, drums, bass and other</span></li>
+          <li style="--c:var(--bass)"><i></i><span><b>Auto-mix</b> with loudness-based goals</span></li>
+          <li style="--c:var(--other)"><i></i><span><b>Instrument recognition</b> with Focus EQ</span></li>
+          <li style="--c:var(--muted)"><i></i><span><b>Your mix and zip</b> exports</span></li>
+        </ul>
+      </section>
+    </div>
+
+    <section class="card">
+      <div class="row-between">
+        <div style="display:grid;gap:2px"><h2>Ready for the next song?</h2><span class="muted">It all runs on this device.</span></div>
+        <a class="btn btn-secondary" href="studio.html">Open Studio
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>Profile</h2></div>
+      <form class="settings-row" id="nameForm">
+        <label for="fullName">Name</label>
+        <div class="inline-field field" style="display:flex">
+          <input id="fullName" autocomplete="name" required>
+          <button class="btn btn-secondary" type="submit">Save</button>
+        </div>
+      </form>
+      <div class="settings-row">
+        <label for="emailShown">Email</label>
+        <div class="field"><input id="emailShown" readonly><span class="hint" id="emailNote" hidden>Managed by Google sign-in</span></div>
+      </div>
+      <form id="pwForm" class="form-stack" style="padding-top:18px;border-top:1px solid var(--line)" hidden>
+        <h2 style="font-size:18px">Change password</h2>
+        <div class="settings-row">
+          <label for="currentPw">Current password</label>
+          <div class="field"><input id="currentPw" type="password" autocomplete="current-password" required></div>
+        </div>
+        <div class="settings-row">
+          <label for="newPw">New password</label>
+          <div class="field"><input id="newPw" type="password" autocomplete="new-password" minlength="8" required aria-describedby="newPwHint"><span class="hint" id="newPwHint">At least 8 characters</span></div>
+        </div>
+        <button class="btn btn-secondary" type="submit" style="justify-self:start">Update password</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>Billing</h2></div>
+      <div class="row-between">
+        <p class="muted" id="billingText">You don't have an active subscription.</p>
+        <button class="btn btn-secondary" type="button" id="portal" disabled>Manage billing</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="row-between">
+        <div style="display:grid;gap:2px"><h2>Sign out</h2><span class="muted">Sign out of Unmix on this browser.</span></div>
+        <button class="btn btn-secondary" type="button" id="signOut">Sign out</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="row-between">
+        <div style="display:grid;gap:4px;max-width:56ch"><h2 style="color:var(--voice)">Delete account</h2><span class="muted">This permanently removes your account and usage history and cancels any subscription straight away. It can't be undone.</span></div>
+        <button class="btn btn-danger" type="button" id="deleteOpen">Delete account</button>
+      </div>
+    </section>
+  </div>
+</main>
+
+<dialog id="deleteDialog" aria-labelledby="deleteTitle">
+  <form method="dialog" class="form-stack" id="deleteForm">
+    <h2 id="deleteTitle" class="heading" style="font-size:26px">Delete your account?</h2>
+    <p class="muted">Any subscription ends immediately, with no further charges. To confirm, type DELETE below.</p>
+    <div class="field"><label for="deleteWord">Confirmation</label><input id="deleteWord" autocomplete="off"></div>
+    <p class="notice bad" id="deleteError" role="alert" hidden></p>
+    <div class="cta-row" style="justify-content:flex-end">
+      <button class="btn btn-secondary" type="button" id="deleteCancel">Keep my account</button>
+      <button class="btn btn-danger" type="button" id="deleteConfirm" disabled>Delete forever</button>
+    </div>
+  </form>
+</dialog>
+<div id="site-footer-slot"></div>
+<script type="module" src="account.js"></script>
+</body>
+</html>

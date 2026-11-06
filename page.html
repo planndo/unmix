@@ -1,4 +1,4 @@
-<title>Unmix Studio</title>
+<title>Studio | Unmix</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Separate vocals, drums, bass and the rest of any song with AI, right in your browser.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -188,16 +188,39 @@ footer .credit a:hover { background-size: 100% 100%; color: var(--bg); }
   .scrub { order: 5; flex-basis: 100%; }
   .hero { padding-block: 28px 20px; }
 }
+.brand { color: inherit; text-decoration: none; }
+.studio-nav { display: flex; align-items: center; gap: 16px; margin-left: auto; font-size: 14px; font-weight: 500; }
+.studio-nav a { color: var(--fg); text-decoration: none; }
+.nav-auth { display: inline-flex; align-items: center; gap: 12px; }
+.nav-signup { background: var(--fg); color: var(--bg) !important; border-radius: 99px; padding: 7px 14px; font-weight: 600; white-space: nowrap; }
+.plan-chip { font: 500 11px var(--f-mono); letter-spacing: .03em; border: 1px solid var(--line); border-radius: 99px; padding: 4px 10px; color: var(--muted); white-space: nowrap; }
+.plan-chip.pro { color: var(--other); border-color: var(--other); }
+.pro-tag { font: 600 9.5px var(--f-mono); letter-spacing: .05em; border: 1px solid var(--line); border-radius: 5px; padding: 1px 4px; margin-left: 6px; color: var(--muted); vertical-align: 1px; }
+.promo { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+.promo .cta { text-decoration: none; white-space: nowrap; padding: 11px 20px; }
+.foot-links { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0 0 12px; font-size: 14px; }
+.foot-links a { color: var(--fg); text-decoration: none; }
+.foot-links a:hover { text-decoration: underline; text-underline-offset: 3px; }
+#upsell { background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 20px; padding: 26px; width: min(440px, calc(100vw - 32px)); box-shadow: var(--shadow); }
+#upsell::backdrop { background: rgba(5, 4, 12, .66); }
+#upsell h2 { margin: 0 0 8px; font: 700 26px/1.1 var(--f-display); letter-spacing: -.02em; }
+#upsell p { margin: 0 0 20px; color: var(--muted); }
+.upsell-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 10px; }
+.upsell-actions a { text-decoration: none; color: inherit; }
+.upsell-actions a.cta { color: var(--bg); padding: 10px 20px; }
+@media (max-width: 860px) { .privacy-pill { display: none; } }
+@media (max-width: 560px) { .promo { grid-template-columns: 1fr; } .studio-nav { gap: 10px; } #planChip { display: none; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; } }
 </style>
 
 <div class="wrap">
   <header class="top">
-    <div class="brand" aria-label="Unmix">
+    <a class="brand" href="index.html" aria-label="Unmix home">
       <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="11" width="3.2" height="10" rx="1.6" fill="var(--fg)"/><rect x="9" y="6" width="3.2" height="20" rx="1.6" fill="var(--voice)"/><rect x="15" y="9" width="3.2" height="14" rx="1.6" fill="var(--drums)"/><rect x="21" y="4" width="3.2" height="24" rx="1.6" fill="var(--bass)"/><rect x="27" y="12" width="3.2" height="8" rx="1.6" fill="var(--other)"/></svg>
       unmix
-    </div>
-    <span class="pill" title="Separation runs on your own device. Your audio is never uploaded.">
+    </a>
+    <nav class="studio-nav" aria-label="Main"><a href="pricing.html">Pricing</a><span class="plan-chip" id="planChip" hidden></span><span id="navAuth" class="nav-auth"></span></nav>
+    <span class="pill privacy-pill" title="Separation runs on your own device. Your audio is never uploaded.">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
       Private: runs on your device
     </span>
@@ -208,14 +231,14 @@ footer .credit a:hover { background-size: 100% 100%; color: var(--bg); }
   <!-- LANDING -->
   <section id="landing" class="wrap">
     <div class="hero">
-      <h1>Take any song <em>apart.</em></h1>
-      <p class="lede">Pull the voice out of a track, or split it into vocals, drums, bass and everything else. Then mix it your way, by hand or with Auto-mix, and keep every stem as a lossless WAV. Free, no sign-up, nothing uploaded.</p>
+      <h1>What are we <em>unmixing?</em></h1>
+      <p class="lede">Pull the voice out of a track, or split it into vocals, drums, bass and everything else. Then mix it your way and keep every stem as a lossless WAV. Nothing is uploaded.</p>
       <div id="drop" class="drop" tabindex="0" role="button" aria-label="Choose a song to separate">
         <canvas class="strands" id="strands" aria-hidden="true"></canvas>
         <div class="inner">
           <div class="seg" role="group" aria-label="Separation type">
             <button type="button" id="mode2" aria-pressed="false">Voice + instrumental</button>
-            <button type="button" id="mode4" aria-pressed="true">4 stems</button>
+            <button type="button" id="mode4" aria-pressed="true">4 stems<span class="pro-tag" data-pro-tag hidden>PRO</span></button>
           </div>
           <h2>Drop a song here</h2>
           <button class="cta" type="button" id="pick">
@@ -229,7 +252,7 @@ footer .credit a:hover { background-size: 100% 100%; color: var(--bg); }
     </div>
     <div class="facts">
       <div class="fact"><b>Studio-grade models</b><span>MDX-Net networks trained on multitrack recordings, the same family used by pro stem tools.</span></div>
-      <div class="fact"><b>Your song stays with you</b><span>The AI runs inside this browser tab on your GPU or CPU. No uploads, no queue, no account.</span></div>
+      <div class="fact"><b>Your song stays with you</b><span>The AI runs inside this browser tab on your GPU or CPU. No uploads and no queue.</span></div>
       <div class="fact"><b>Knows what's playing</b><span>Recognises marimba, sax, guitar, keys, strings and more, and gives each one its own Focus EQ.</span></div>
     </div>
   </section>
@@ -282,7 +305,7 @@ footer .credit a:hover { background-size: 100% 100%; color: var(--bg); }
         <h3>Mixer
           <span class="seg" role="group" aria-label="Mixer mode">
             <button type="button" id="mManual" aria-pressed="true">Manual</button>
-            <button type="button" id="mAuto" aria-pressed="false">Auto-mix</button>
+            <button type="button" id="mAuto" aria-pressed="false">Auto-mix<span class="pro-tag" data-pro-tag hidden>PRO</span></button>
           </span>
         </h3>
         <div id="manualPane" style="display:grid;gap:12px">
@@ -301,18 +324,25 @@ footer .credit a:hover { background-size: 100% 100%; color: var(--bg); }
         <div class="dl" id="dl"></div>
       </div>
     </div>
+    <div class="card promo" id="proPromo" hidden><div><h3 id="promoTitle"></h3><p class="hint" id="promoText"></p></div><a class="cta" id="promoLink" href="pricing.html"></a></div>
     <p class="keys"><kbd>Space</kbd> play or pause · <kbd>←</kbd><kbd>→</kbd> skip 5 s · <kbd>1</kbd>–<kbd>4</kbd> solo a stem · <kbd>0</kbd> clear solos · drag the timeline to loop</p>
   </section>
 </main>
 
-<div class="wrap"><footer><p class="credit">Developed by <a href="https://www.linkedin.com/in/joseamandlate/" target="_blank" rel="noopener">Pygrammer</a></p>Unmix separates audio with open MDX-Net models (Kim Vocal 2 and KUIELab drums and bass) and recognises instruments with EfficientAT (AudioSet), all run by ONNX Runtime Web. Only process music you have the rights to use.</footer></div>
+<div class="wrap"><footer><p class="foot-links"><a href="index.html">Home</a><a href="pricing.html">Pricing</a><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a></p><p class="credit">Developed by <a href="https://www.linkedin.com/in/joseamandlate/" target="_blank" rel="noopener">Pygrammer</a></p>Unmix separates audio with open MDX-Net models (Kim Vocal 2 and KUIELab drums and bass) and recognises instruments with EfficientAT (AudioSet), all run by ONNX Runtime Web. Only process music you have the rights to use.</footer></div>
 <div class="toast" id="toast" role="status"></div>
+<dialog id="upsell" aria-labelledby="upsellTitle">
+  <h2 id="upsellTitle"></h2>
+  <p id="upsellText"></p>
+  <div class="upsell-actions"><button class="ghost-btn" type="button" id="upsellClose">Not now</button><a class="ghost-btn" id="upsellAlt" hidden></a><a class="cta" id="upsellGo"></a></div>
+</dialog>
 
 <script type="module">
 import * as sep from './separator.js';
 const { prepare, runStem, downloadSize } = sep;
 import { detectInstruments } from './instruments.js';
 import { computePeaks, blockPowers, lufsFromPowers, estimateBpm, encodeWav, makeZip } from './audio-utils.js';
+import { accountsEnabled, currentUser, getPlan, claimSong } from './auth.js';
 
 const $ = (id) => document.getElementById(id);
 const SR = 44100, BINS = 1600;
@@ -328,7 +358,7 @@ const STEMS = {
   bass:  { label: 'Bass', color: '--bass' },
   other: { label: 'Other', color: '--other' },
 };
-let mode = '4';
+let mode = accountsEnabled ? '2' : '4';
 const S = { name: '', L: null, R: null, n: 0, dur: 0, order: [], stems: {}, ready: false, mixPeaks: null, bpm: null, abort: null };
 
 /* ---------- landing ---------- */
@@ -337,7 +367,7 @@ function setMode(m) {
   $('modeHint').textContent = m === '4' ? 'MP3, WAV, FLAC, M4A or OGG · vocals, drums, bass and other' : 'MP3, WAV, FLAC, M4A or OGG · vocals and instrumental (faster)';
 }
 $('mode2').onclick = (e) => { e.stopPropagation(); setMode('2'); };
-$('mode4').onclick = (e) => { e.stopPropagation(); setMode('4'); };
+$('mode4').onclick = (e) => { e.stopPropagation(); if (unlocked()) setMode('4'); else showUpsell('fourStems'); };
 $('pick').onclick = (e) => { e.stopPropagation(); $('file').click(); };
 $('drop').onclick = () => $('file').click();
 $('drop').onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('file').click(); } };
@@ -345,6 +375,55 @@ $('file').onchange = () => { const f = $('file').files[0]; if (f) start(f); $('f
 ['dragenter', 'dragover'].forEach((t) => addEventListener(t, (e) => { e.preventDefault(); $('drop').classList.add('over'); }));
 ['dragleave', 'drop'].forEach((t) => addEventListener(t, (e) => { e.preventDefault(); if (t === 'drop' || e.target === document.documentElement) $('drop').classList.remove('over'); }));
 addEventListener('drop', (e) => { const f = e.dataTransfer?.files?.[0]; if (f && !$('landing').hidden) start(f); });
+
+/* ---------- plans ---------- */
+// Limits run in this browser because the separation does, so they keep honest users honest
+// rather than stopping someone who edits the page. The monthly count is enforced on the server.
+let plan = { tier: accountsEnabled ? 'guest' : 'open' };
+const unlocked = () => plan.tier === 'open' || plan.tier === 'pro';
+const UPSELL = {
+  fourStems: ['Split into 4 stems with Pro', 'Pro separates drums, bass and the rest as well as the vocals, with unlimited songs.'],
+  autoMix: ['Auto-mix is part of Pro', 'Pro balances the stems for you, using broadcast-standard loudness measurements.'],
+  exports: ['This export is part of Pro', 'Pro lets you export your own mix and download everything as a zip.'],
+  monthLimit: ['You have used this month\'s songs', 'Upgrade to Pro for unlimited songs, or come back when your free songs reset next month.'],
+  guestLimit: ['Keep going with a free account', 'You have used your free try on this device. A free account gives you 5 songs every month.'],
+};
+function showUpsell(key) {
+  const guest = plan.tier === 'guest';
+  const [title, text] = UPSELL[key];
+  $('upsellTitle').textContent = title; $('upsellText').textContent = text;
+  $('upsellGo').textContent = guest && key === 'guestLimit' ? 'Create free account' : 'See Pro plans';
+  $('upsellGo').href = guest && key === 'guestLimit' ? 'signup.html' : 'pricing.html';
+  $('upsellAlt').hidden = !guest;
+  $('upsellAlt').textContent = 'Log in'; $('upsellAlt').href = 'login.html';
+  $('upsell').showModal();
+}
+$('upsellClose').onclick = () => $('upsell').close();
+function renderPlan() {
+  document.querySelectorAll('[data-pro-tag]').forEach((n) => { n.hidden = unlocked(); });
+  const chip = $('planChip');
+  chip.hidden = plan.tier !== 'free' && plan.tier !== 'pro';
+  chip.textContent = plan.tier === 'pro' ? 'PRO' : `${plan.used} of ${plan.limit} songs`;
+  chip.classList.toggle('pro', plan.tier === 'pro');
+  $('proPromo').hidden = unlocked();
+  const guest = plan.tier === 'guest';
+  $('promoTitle').textContent = guest ? 'Want to keep this going?' : 'Hear more with Pro';
+  $('promoText').textContent = guest ? 'A free account gives you 5 songs every month.' : 'Unlimited songs, 4 stems, Auto-mix and instrument recognition for $5 a month.';
+  $('promoLink').textContent = guest ? 'Create free account' : 'See Pro plans';
+  $('promoLink').href = guest ? 'signup.html' : 'pricing.html';
+}
+async function refreshPlan() {
+  try { plan = await getPlan(); }
+  catch (e) { console.warn('[unmix] could not check the plan', e); plan = { tier: 'free', used: 0, limit: 0, unverified: true }; }
+  setMode(unlocked() ? '4' : '2');
+  renderPlan();
+  const nav = $('navAuth');
+  if (!accountsEnabled) return;
+  nav.innerHTML = (await currentUser().catch(() => null))
+    ? '<a href="account.html">Your account</a>'
+    : '<a href="login.html">Log in</a><a class="nav-signup" href="signup.html">Sign up free</a>';
+}
+const planReady = refreshPlan();
 
 // ambient hero: one grey waveform that fans out into four coloured stems
 (function strands() {
@@ -375,9 +454,9 @@ addEventListener('drop', (e) => { const f = e.dataTransfer?.files?.[0]; if (f &&
 })();
 
 /* ---------- processing ---------- */
-const PHASES = () => mode === '4'
+const PHASES = () => (mode === '4'
   ? [['load', 'Load AI models'], ['decode', 'Read audio'], ['voice', 'Separate vocals'], ['drums', 'Isolate drums'], ['bass', 'Isolate bass'], ['tag', 'Identify instruments'], ['finish', 'Analyse mix']]
-  : [['load', 'Load AI model'], ['decode', 'Read audio'], ['voice', 'Separate vocals'], ['tag', 'Identify instruments'], ['finish', 'Analyse mix']];
+  : [['load', 'Load AI model'], ['decode', 'Read audio'], ['voice', 'Separate vocals'], ['tag', 'Identify instruments'], ['finish', 'Analyse mix']]).filter((p) => p[0] !== 'tag' || unlocked());
 function setPhase(key, label) {
   $('phase').textContent = label;
   const list = PHASES(); const idx = list.findIndex((p) => p[0] === key);
@@ -399,6 +478,10 @@ async function decode(file) {
 }
 
 async function start(file) {
+  await planReady;
+  if (plan.unverified) await refreshPlan();
+  if (plan.unverified) { toast('We could not check your plan. Check your connection and try again.'); return; }
+  if (!unlocked() && plan.used >= plan.limit) { showUpsell(plan.tier === 'guest' ? 'guestLimit' : 'monthLimit'); return; }
   stopPlayback();
   S.name = file.name.replace(/\.[^.]+$/, ''); S.ready = false; S.stems = {}; S.bpm = null; S.instruments = []; renderInstruments();
   S.order = mode === '4' ? ['voice', 'drums', 'bass', 'other'] : ['voice', 'music'];
@@ -409,7 +492,7 @@ async function start(file) {
   buildLanes(); buildPanels();
   const abort = new AbortController(); S.abort = abort; const t0 = performance.now();
   try {
-    const keys = mode === '4' ? ['vocals', 'drums', 'bass', 'tagger'] : ['vocals', 'tagger'];
+    const keys = (mode === '4' ? ['vocals', 'drums', 'bass', 'tagger'] : ['vocals', 'tagger']).filter((k) => k !== 'tagger' || unlocked());
     setPhase('decode', 'Reading audio');
     const dec = await decode(file);
     S.L = dec.L; S.R = dec.R; S.n = S.L.length; S.dur = S.n / SR;
@@ -421,6 +504,12 @@ async function start(file) {
     const need = await downloadSize(keys);
     setPhase('load', need > 0 ? `Downloading AI models (${(need / 1e6).toFixed(0)} MB, only the first time)` : 'Loading AI models');
     await prepare(keys, (got, total) => { setBar(got / total * 0.999); if (need > 0) $('eta').textContent = `${(got / 1e6).toFixed(0)} / ${(total / 1e6).toFixed(0)} MB`; });
+    // Count the song only once it is really about to run, so a failed model download costs nothing.
+    let claim;
+    try { claim = await claimSong(plan); }
+    catch (e) { console.warn(e); throw new Error('we could not check your plan. Check your connection and try again'); }
+    if (!claim.allowed) { goHome(); showUpsell(plan.tier === 'guest' ? 'guestLimit' : 'monthLimit'); return; }
+    if (claim.used != null) { plan.used = claim.used; renderPlan(); }
     $('eta').textContent = 'Starting…'; setBar(0);
 
     // estimate total work in "voice chunks" so one bar covers all phases
@@ -455,11 +544,13 @@ async function start(file) {
       const o = S.stems.other; for (let i = 0; i < S.n; i++) { o.L[i] = iL[i] - d.L[i] - b.L[i]; o.R[i] = iR[i] - d.R[i] - b.R[i]; }
     }
     S.eqStem = mode === '4' ? 'other' : 'music'; S.instruments = [];
-    setPhase('tag', 'Listening for instruments');
-    try {
-      S.instruments = await detectInstruments(S.stems[S.eqStem], SR, sep.runTagger);
-      S.instruments.forEach((x) => (x.db = 0));
-    } catch (e) { console.warn('[unmix] instrument recognition failed', e); }
+    if (unlocked()) {
+      setPhase('tag', 'Listening for instruments');
+      try {
+        S.instruments = await detectInstruments(S.stems[S.eqStem], SR, sep.runTagger);
+        S.instruments.forEach((x) => (x.db = 0));
+      } catch (e) { console.warn('[unmix] instrument recognition failed', e); }
+    }
     setPhase('finish', 'Analysing loudness and tempo');
     await new Promise((r) => setTimeout(r, 30));
     for (const k of S.order) { const s = S.stems[k]; computePeaks(s.L, s.R, BINS, s.peaks); s.filled = S.n; s.lufs = lufsFromPowers(blockPowers(s.L, s.R)); }
@@ -731,18 +822,19 @@ function buildPanels() {
   });
   GOALS[mode].forEach(([name, sub, g]) => { const b = chip(name, sub); b.onclick = () => { autoMix(g); pressOnly('#goals', b); }; $('goals').append(b); });
   $('dl').innerHTML = '';
-  const add = (label, color, fn, wide) => { const b = document.createElement('button'); b.type = 'button'; if (wide) b.className = 'wide'; else b.style.setProperty('--c', `var(${color})`);
-    b.innerHTML = wide ? `<span>${label}</span>` : `<i></i><span>${label}</span>`; b.onclick = () => runDownload(b, fn); $('dl').append(b); };
+  const add = (label, color, fn, wide, pro) => { const b = document.createElement('button'); b.type = 'button'; if (wide) b.className = 'wide'; else b.style.setProperty('--c', `var(${color})`);
+    const tag = pro && !unlocked() ? '<small class="pro-tag">PRO</small>' : '';
+    b.innerHTML = wide ? `<span>${label}</span>${tag}` : `<i></i><span>${label}</span>${tag}`; b.onclick = () => (pro && !unlocked() ? showUpsell('exports') : runDownload(b, fn)); $('dl').append(b); };
   add('Vocals only', '--voice', () => [[`${S.name} (Vocals).wav`, wavOf('voice')]]);
   add('Instrumental', '--music', () => [[`${S.name} (Instrumental).wav`, mode === '4' ? encodeWav(S.inst.L, S.inst.R) : wavOf('music')]]);
   if (mode === '4') { add('Drums', '--drums', () => [[`${S.name} (Drums).wav`, wavOf('drums')]]); add('Bass', '--bass', () => [[`${S.name} (Bass).wav`, wavOf('bass')]]); add('Other', '--other', () => [[`${S.name} (Other).wav`, wavOf('other')]]); }
-  add('Your mix', '--fg', async () => [[`${S.name} (My mix).wav`, await mixWav()]]);
+  add('Your mix', '--fg', async () => [[`${S.name} (My mix).wav`, await mixWav()]], false, true);
   add(mode === '4' ? 'All stems + instrumental (.zip)' : 'Both stems (.zip)', null, () => {
     const files = S.order.map((k) => [`${S.name} (${STEMS[k].label}).wav`, wavOf(k)]);
     if (mode === '4') files.push([`${S.name} (Instrumental).wav`, encodeWav(S.inst.L, S.inst.R)]);
     return files;
-  }, true);
-  $('mManual').onclick = () => setMixMode('manual'); $('mAuto').onclick = () => setMixMode('auto');
+  }, true, true);
+  $('mManual').onclick = () => setMixMode('manual'); $('mAuto').onclick = () => (unlocked() ? setMixMode('auto') : showUpsell('autoMix'));
   setMixMode('manual'); renderMeters();
 }
 function chip(name, sub) { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.setAttribute('aria-pressed', 'false'); b.innerHTML = `${name}<small>${sub}</small>`; b.disabled = !S.ready; return b; }
@@ -801,7 +893,7 @@ function fmtHz(f) { return f >= 1000 ? `${(f / 1000).toFixed(f >= 10000 ? 0 : 1)
 function renderInstruments() {
   const card = $('instCard'), box = $('insts'); if (!card) return;
   const list = S.instruments || [];
-  card.hidden = !S.order.length || (!S.ready && !list.length);
+  card.hidden = !unlocked() || !S.order.length || (!S.ready && !list.length);
   const stemLabel = STEMS[S.eqStem || 'other']?.label || 'Other';
   $('instTitle').textContent = `Instruments in “${stemLabel}”`;
   box.innerHTML = '';
