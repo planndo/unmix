@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://planndo.github.io/unmix/sitemap.xml

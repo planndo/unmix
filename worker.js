@@ -1,4 +1,4 @@
-// Unmix inference worker: one ONNX session, converts audio chunks -> separated chunk.
+// Timbila inference worker: one ONNX session, converts audio chunks -> separated chunk.
 import * as ort from './ort/ort.webgpu.min.mjs';
 import { MdxSpec } from './dsp.js';
 

@@ -108,5 +108,14 @@ export async function detectInstruments(stem, sr, runTagger) {
     g.q = 0.9; // about 1.5 octaves wide: catches fundamentals and the first harmonics
     delete g.per;
   }
+  // keep each instrument's band at least a third of an octave from the others (short clips can
+  // land two instruments on the same band, and then their sliders fight each other)
+  const used = [];
+  for (const g of found) {
+    const tries = [0, 1, -1, 2, -2, 3, -3].map((s) => g.center * Math.pow(2, s / 3)).filter((f) => f >= g.range[0] * 0.8 && f <= g.range[1] * 1.2);
+    const ok = tries.find((f) => used.every((u) => Math.abs(Math.log2(f / u)) >= 1 / 3 - 1e-6));
+    if (ok) g.center = Math.round(ok);
+    used.push(g.center);
+  }
   return found;
 }

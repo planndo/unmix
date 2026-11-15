@@ -1,10 +1,12 @@
-// Unmix separation orchestrator (main thread). Fetches + caches the runtime and models,
+// Timbila separation orchestrator (main thread). Fetches + caches the runtime and models,
 // runs a pool of inference workers (1 on GPU, several on CPU) and stitches chunks.
 import { MdxSpec } from './dsp.js';
 
 const BASE = new URL('./', import.meta.url);
 const CACHE = 'unmix-assets-v1';
 export const MODELS = {
+  // Fast vocal model (UVR-MDX-NET 1, 29 MB): ~2.8x faster than Kim Vocal 2 with very close results.
+  vocalsFast: { label: 'Voice model (fast)', parts: 3, file: 'mdx-vocal-fast', bytes: 29704436, nFft: 6144, hop: 1024, dimF: 2048, dimT: 256 },
   vocals: { label: 'Voice model', parts: 5, file: 'kim-vocal-2', bytes: 66759214, nFft: 7680, hop: 1024, dimF: 3072, dimT: 256 },
   drums:  { label: 'Drums model', parts: 3, file: 'kuielab-drums', bytes: 29703204, nFft: 4096, hop: 1024, dimF: 2048, dimT: 512 },
   bass:   { label: 'Bass model',  parts: 3, file: 'kuielab-bass',  bytes: 29703204, nFft: 16384, hop: 1024, dimF: 2048, dimT: 512 },
@@ -19,7 +21,7 @@ async function isCached(path) {
   try { return !!(await c.match(new URL(path, BASE).href)); } catch { return false; }
 }
 
-async function getBytes(path, onBytes) {
+export async function getBytes(path, onBytes = () => {}) {
   const url = new URL(path, BASE).href; const cache = await openCache();
   if (cache) { try { const hit = await cache.match(url); if (hit) { const b = new Uint8Array(await hit.arrayBuffer()); onBytes(b.length); return b; } } catch {} }
   const res = await fetch(url);
@@ -78,7 +80,7 @@ let gpuBroken = false;
 
 export async function makePool(key, { preferGpu = true, allowSoftware = false } = {}) {
   if (preferGpu && !gpuBroken && 'gpu' in navigator) {
-    try { const w = await spawn(key, 'webgpu', allowSoftware); lastBackend = 'gpu'; return [w]; } catch (e) { gpuBroken = true; console.info('[unmix] GPU path unavailable:', e.message); }
+    try { const w = await spawn(key, 'webgpu', allowSoftware); lastBackend = 'gpu'; return [w]; } catch (e) { gpuBroken = true; console.info('[timbila] GPU path unavailable:', e.message); }
   }
   const cores = navigator.hardwareConcurrency || 4; const mem = navigator.deviceMemory || 4;
   const memCap = mem >= 8 ? 4 : mem >= 4 ? 2 : 1;
@@ -147,4 +149,8 @@ export async function runTagger(waves) {
     }
     return out;
   } finally { w.terminate(); }
+}
+
+export async function gunzip(bytes) {
+  return new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
 }
